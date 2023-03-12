@@ -32,6 +32,7 @@
 
 #include "../gdscript.h"
 #include "core/os/os.h"
+#include "editor/debugger/editor_debugger_node.h"
 #include "editor/editor_settings.h"
 #include "editor/plugins/script_text_editor.h"
 #include "gdscript_extend_parser.h"
@@ -110,6 +111,7 @@ void GDScriptTextDocument::didSave(const Variant &p_param) {
 		scr->update_exports();
 		ScriptEditor::get_singleton()->reload_scripts(true);
 		ScriptEditor::get_singleton()->update_docs_from_script(scr);
+		ScriptEditor::get_singleton()->_trigger_live_script_reload();
 	}
 }
 

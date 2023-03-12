@@ -372,7 +372,9 @@ class ScriptEditor : public PanelContainer {
 
 	bool pending_auto_reload;
 	bool auto_reload_running_scripts;
+public:
 	void _trigger_live_script_reload();
+private:
 	void _live_auto_reload_running_scripts();
 
 	void _update_selected_editor_menu();
