@@ -10307,9 +10307,11 @@ Error ShaderLanguage::complete(const String &p_code, const ShaderCompileInfo &p_
 
 			for (const KeyValue<String, ScriptLanguage::CodeCompletionKind> &E : matches) {
 				ScriptLanguage::CodeCompletionOption option(E.key, E.value);
+#ifdef ENABLE_PAREN_COMPLETION
 				if (E.value == ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION) {
 					option.insert_text += "(";
 				}
+#endif
 				r_options->push_back(option);
 			}
 

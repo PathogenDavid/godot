@@ -1024,11 +1024,13 @@ static void _find_identifiers_in_class(const GDScriptParser::ClassNode *p_class,
 							continue;
 						}
 						option = ScriptLanguage::CodeCompletionOption(member.function->identifier->name, ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION, location);
+#ifdef ENABLE_PAREN_COMPLETION
 						if (member.function->parameters.size() > 0) {
 							option.insert_text += "(";
 						} else {
 							option.insert_text += "()";
 						}
+#endif
 						break;
 					case GDScriptParser::ClassNode::Member::SIGNAL:
 						if (p_only_functions || outer || p_static) {
@@ -1064,7 +1066,9 @@ static void _find_identifiers_in_base(const GDScriptCompletionIdentifier &p_base
 
 	if (base_type.is_meta_type && base_type.kind != GDScriptParser::DataType::BUILTIN && base_type.kind != GDScriptParser::DataType::ENUM) {
 		ScriptLanguage::CodeCompletionOption option("new", ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION, ScriptLanguage::LOCATION_LOCAL);
+#ifdef ENABLE_PAREN_COMPLETION
 		option.insert_text += "(";
+#endif
 		r_result.insert(option.display, option);
 	}
 
@@ -1119,11 +1123,13 @@ static void _find_identifiers_in_base(const GDScriptCompletionIdentifier &p_base
 						}
 						int location = p_recursion_depth + _get_method_location(scr->get_class_name(), E.name);
 						ScriptLanguage::CodeCompletionOption option(E.name, ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION, location);
+#ifdef ENABLE_PAREN_COMPLETION
 						if (E.arguments.size()) {
 							option.insert_text += "(";
 						} else {
 							option.insert_text += "()";
 						}
+#endif
 						r_result.insert(option.display, option);
 					}
 
@@ -1192,11 +1198,13 @@ static void _find_identifiers_in_base(const GDScriptCompletionIdentifier &p_base
 					}
 					int location = p_recursion_depth + _get_method_location(type, E.name);
 					ScriptLanguage::CodeCompletionOption option(E.name, ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION, location);
+#ifdef ENABLE_PAREN_COMPLETION
 					if (E.arguments.size()) {
 						option.insert_text += "(";
 					} else {
 						option.insert_text += "()";
 					}
+#endif
 					r_result.insert(option.display, option);
 				}
 				return;
@@ -1240,11 +1248,13 @@ static void _find_identifiers_in_base(const GDScriptCompletionIdentifier &p_base
 						continue;
 					}
 					ScriptLanguage::CodeCompletionOption option(E.name, ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION);
+#ifdef ENABLE_PAREN_COMPLETION
 					if (E.arguments.size()) {
 						option.insert_text += "(";
 					} else {
 						option.insert_text += "()";
 					}
+#endif
 					r_result.insert(option.display, option);
 				}
 
@@ -1273,11 +1283,13 @@ static void _find_identifiers(const GDScriptParser::CompletionContext &p_context
 	for (const StringName &E : functions) {
 		MethodInfo function = GDScriptUtilityFunctions::get_function_info(E);
 		ScriptLanguage::CodeCompletionOption option(String(E), ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION);
+#ifdef ENABLE_PAREN_COMPLETION
 		if (function.arguments.size() || (function.flags & METHOD_FLAG_VARARG)) {
 			option.insert_text += "(";
 		} else {
 			option.insert_text += "()";
 		}
+#endif
 		r_result.insert(option.display, option);
 	}
 
@@ -1309,7 +1321,9 @@ static void _find_identifiers(const GDScriptParser::CompletionContext &p_context
 	const char **kws = _keywords_with_space;
 	while (*kws) {
 		ScriptLanguage::CodeCompletionOption option(*kws, ScriptLanguage::CODE_COMPLETION_KIND_PLAIN_TEXT);
+#ifdef ENABLE_PAREN_COMPLETION
 		option.insert_text += " ";
+#endif
 		r_result.insert(option.display, option);
 		kws++;
 	}
@@ -1322,7 +1336,9 @@ static void _find_identifiers(const GDScriptParser::CompletionContext &p_context
 	const char **kwa = _keywords_with_args;
 	while (*kwa) {
 		ScriptLanguage::CodeCompletionOption option(*kwa, ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION);
+#ifdef ENABLE_PAREN_COMPLETION
 		option.insert_text += "(";
+#endif
 		r_result.insert(option.display, option);
 		kwa++;
 	}
@@ -1332,7 +1348,9 @@ static void _find_identifiers(const GDScriptParser::CompletionContext &p_context
 
 	for (List<StringName>::Element *E = utility_func_names.front(); E; E = E->next()) {
 		ScriptLanguage::CodeCompletionOption option(E->get(), ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION);
+#ifdef ENABLE_PAREN_COMPLETION
 		option.insert_text += "(";
+#endif
 		r_result.insert(option.display, option);
 	}
 
@@ -2880,9 +2898,11 @@ static void _find_call_arguments(GDScriptParser::CompletionContext &p_context, c
 			parser.get_annotation_list(&annotations);
 			for (const MethodInfo &E : annotations) {
 				ScriptLanguage::CodeCompletionOption option(E.name.substr(1), ScriptLanguage::CODE_COMPLETION_KIND_PLAIN_TEXT);
+#ifdef ENABLE_PAREN_COMPLETION
 				if (E.arguments.size() > 0) {
 					option.insert_text += "(";
 				}
+#endif
 				options.insert(option.display, option);
 			}
 			r_forced = true;
@@ -2917,11 +2937,13 @@ static void _find_call_arguments(GDScriptParser::CompletionContext &p_context, c
 				for (const StringName &E : methods) {
 					if (Variant::is_builtin_method_static(completion_context.builtin_type, E)) {
 						ScriptLanguage::CodeCompletionOption option(E, ScriptLanguage::CODE_COMPLETION_KIND_FUNCTION);
+#ifdef ENABLE_PAREN_COMPLETION
 						if (Variant::get_builtin_method_argument_count(completion_context.builtin_type, E) > 0 || Variant::is_builtin_method_vararg(completion_context.builtin_type, E)) {
 							option.insert_text += "(";
 						} else {
 							option.insert_text += "()";
 						}
+#endif
 						options.insert(option.display, option);
 					}
 				}
